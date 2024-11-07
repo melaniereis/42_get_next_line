@@ -58,30 +58,26 @@ The main goal is to create a function that reads a line from a file descriptor e
 <summary>Installation Steps</summary>
 
 1. **Clone the repository:**
-   ```bash
+   bash
    git clone https://github.com/melaniereis/get_next_line.git
    cd get_next_line
 
-    Compile the project:
-
-    bash
+2. Compile the project:
+   bash
     gcc -Wall -Wextra -Werror -D BUFFER_SIZE=32 *.c
 
-Include the header in your C file:
-
-```c
+3. Include the header in your C file:
+   
 #include "get_next_line.h"
 
-Use get_next_line in your code:
+5. Use get_next_line in your code:
 
-```c
 char *line = get_next_line(fd);
 
 </details>
 💡 Example Usages
 <details> <summary>Click to see code examples</summary>
 
-```c
 #include "get_next_line.h"
 #include <fcntl.h>
 #include <stdio.h>
@@ -90,7 +86,7 @@ int main(void)
 {
     int fd = open("example.txt", O_RDONLY);
     char *line;
-
+    
     while ((line = get_next_line(fd)) != NULL)
     {
         printf("%s", line);
