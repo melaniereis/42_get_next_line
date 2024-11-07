@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Animated Reading Line GIF](https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif)
+![Animated Reading Line GIF](https://media.giphy.com/media/l0HlOBZcl7sbV6LnO/giphy.gif)
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Norminette](https://img.shields.io/badge/norminette-passing-brightgreen.svg)](https://github.com/42School/norminette)
@@ -26,6 +26,8 @@
 - Static variables
 - Memory allocation and management
 - Buffer handling
+
+The main goal is to create a function that reads a line from a file descriptor each time it's called, returning the line that was read. If there's nothing else to read or if an error occurred, it should return NULL.
 
 </details>
 
@@ -67,19 +69,19 @@
 
 Include the header in your C file:
 
-c
+```c
 #include "get_next_line.h"
 
 Use get_next_line in your code:
 
-c
+```c
 char *line = get_next_line(fd);
 
 </details>
 💡 Example Usages
 <details> <summary>Click to see code examples</summary>
 
-c
+```c
 #include "get_next_line.h"
 #include <fcntl.h>
 #include <stdio.h>
@@ -112,6 +114,19 @@ text
 </details>
 📏 Norminette Compliance
 This project adheres to the Norm, the coding standard of 42 School. All files pass the Norminette check, ensuring clean and maintainable code.
+🧪 Testing
+<details> <summary>Test Files and Edge Cases</summary> To thoroughly test get_next_line, consider the following scenarios:
+
+    Empty files
+    Files with only newline characters
+    Files with no newline characters
+    Very large files
+    Files with long lines
+    Files with varying line lengths
+    Reading from standard input
+    Reading from multiple file descriptors
+
+You can create test files or use existing text files to cover these cases. </details>
 👩‍💻 Author
 Melanie Reis <details> <summary>Contact Information</summary>
 
@@ -132,4 +147,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
     Understanding Static Variables in C
     42 School Official Website
 
-</details>
+</details> 
