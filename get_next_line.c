@@ -14,7 +14,8 @@
 #include <unistd.h>
 
 static char	*read_and_store(int fd, char *buff);
-char	*extract_line(char *buff);
+static char	*extract_line(char *buff);
+static char	*update_buffer(char *buff);
 
 char	*get_next_line(int fd)
 {
@@ -55,7 +56,7 @@ static char	*read_and_store(int fd, char *buff)
 	return (buff);
 }
 
-char	*extract_line(char *buff)
+static char	*extract_line(char *buff)
 {
 	size_t	line_size;
 	size_t	i;
@@ -64,14 +65,38 @@ char	*extract_line(char *buff)
 	line_size = 0;
 	if (!buff)
 		return (NULL);
-	while (buffer[i] && buffer[i] != '\n')
+	while (buff[line_size] && buff[line_size] != '\n')
 		line_size++;
-	line = malloc(sizeof(char) * (i + 2)); // +1 for '\n', +1 for '\0'
+	line_size++;
+	line = malloc(sizeof(char) * (line_size + 1)); // +1 for '\0'
 	if (!line)
 		return (NULL);
 	i = -1;
-	while (++i < line_size + 1)
+	while (++i < line_size)
 		line[i] = buff[i];
 	line[i] = '\0';
 	return (line);
+}
+
+static char	*update_buffer(char *buff)
+{
+	char	*buffer;
+	size_t i;
+	size_t j;
+
+	if (!buff)
+		return (NULL);
+	i = 0;
+	while (buff[i] != '\n')
+		i++;
+	i++;
+	buffer = malloc(sizeof(char) * i);
+	if (!buffer)
+		return (NULL);
+	j = 0;
+	while (buff[i])
+		buffer[j++] = buff[i++];
+	buffer[j] = '\0';
+	free(buff);
+	return (buffer);
 }
