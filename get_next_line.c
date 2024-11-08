@@ -20,8 +20,10 @@ static char	*update_buffer(char *buff);
 char	*get_next_line(int fd)
 {
 	static char	*buffer;
-	char *line;
+	char		*line;
 
+	buffer = malloc(1);
+	buffer[0] = '\0';
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	buffer = read_and_store(fd, buffer);
@@ -68,7 +70,7 @@ static char	*extract_line(char *buff)
 	while (buff[line_size] && buff[line_size] != '\n')
 		line_size++;
 	line_size++;
-	line = malloc(sizeof(char) * (line_size + 1)); // +1 for '\0'
+	line = malloc(sizeof(char) * (line_size + 1));
 	if (!line)
 		return (NULL);
 	i = -1;
@@ -80,9 +82,9 @@ static char	*extract_line(char *buff)
 
 static char	*update_buffer(char *buff)
 {
+	size_t	i;
+	size_t	j;
 	char	*buffer;
-	size_t i;
-	size_t j;
 
 	if (!buff)
 		return (NULL);
