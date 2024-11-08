@@ -62,9 +62,11 @@ int	main(int argc, char **argv)
 				printf("Error opening file.\n");
 				return (1);
 			}
+			while(1){
 			line = get_next_line(fd);
 			printf("%s", line);
 			free(line);
+			}
 			close(fd);
 		}
 		else
