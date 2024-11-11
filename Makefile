@@ -39,16 +39,22 @@ SPARKLES = ✨
 
 # Directory structure
 BUILD_PATH = .build
-SRC_PATH = .
-BONUS_PATH = srcs_bonus
-INC_PATH = .
+SRC_PATH = ../srcs
+BONUS_PATH = ../srcs_bonus
+INC_PATH = ../incs
+INC_PATH_BONUS = ../incs_bonus
 HEADERS = ${INC_PATH}/get_next_line.h
+HEADERS_BONUS = ${INC_PATH_BONUS}/get_next_line_bonus.h
 
 # Source files for main library
 SRCS = ${addprefix ${SRC_PATH}/, get_next_line.c get_next_line_utils.c}
 # Object files derived from source files
 OBJS = ${addprefix ${BUILD_PATH}/, ${notdir ${SRCS:.c=.o}}}
-
+# Source bonus files for main library
+SRCS_BONUS = ${addprefix ${SRC_PATH}/, get_next_line_bonus.c \
+			 get_next_line_utils_bonus.c}
+# Object bonus files derived from source files
+OBJS_BONUS = ${addprefix ${BUILD_PATH}/, ${notdir ${SRCS_BONUS:.c=.o}}}
 #------------------------------------------------------------------------------#
 #                            	   FLAGS & COMMANDS                            #
 #------------------------------------------------------------------------------#
