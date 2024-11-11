@@ -6,18 +6,6 @@
 /*   By: meferraz <meferraz@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:56:25 by meferraz          #+#    #+#             */
-/*   Updated: 2024/11/07 16:13:56 by meferraz         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: meferraz <meferraz@student.42porto.com>    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/07 15:56:25 by meferraz          #+#    #+#             */
 /*   Updated: 2024/11/08 16:30:00 by meferraz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -62,11 +50,14 @@ int	main(int argc, char **argv)
 				printf("Error opening file.\n");
 				return (1);
 			}
-			while(1){
-			line = get_next_line(fd);
-			printf("%s", line);
-			free(line);
+			while ((line = get_next_line(fd)) != NULL)
+			{
+				printf("%s", line);
+				free(line);
 			}
+			// Cleanup: call get_next_line one more time with an invalid fd
+			//line = get_next_line(-1);
+			//free(line);  // This should be NULL, but free it just in case
 			close(fd);
 		}
 		else

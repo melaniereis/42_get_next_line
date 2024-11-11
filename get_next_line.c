@@ -22,10 +22,19 @@ char	*get_next_line(int fd)
 	static char	*buffer;
 	char		*line;
 
-	buffer = malloc(1);
-	buffer[0] = '\0';
 	if (fd < 0 || BUFFER_SIZE <= 0)
+	{
+		free(buffer);
+		buffer = NULL;
 		return (NULL);
+	}
+	if (!buffer)
+	{
+		buffer = malloc(1);
+		if (!buffer)
+			return (NULL);
+		buffer[0] = '\0';
+	}
 	buffer = read_and_store(fd, buffer);
 	if (!buffer)
 		return (NULL);
@@ -49,10 +58,17 @@ static char	*read_and_store(int fd, char *buff)
 		if (bytes_read == -1)
 		{
 			free (buffer);
+			free (buff);
 			return (NULL);
 		}
 		buffer[bytes_read] = '\0';
 		buff = ft_strjoin(buff, buffer);
+	}
+	if (bytes_read == 0 && buff[0] == '\0')
+	{
+		free(buff);
+		free(buffer);
+		return (NULL);
 	}
 	free(buffer);
 	return (buff);
@@ -89,10 +105,38 @@ static char	*update_buffer(char *buff)
 	if (!buff)
 		return (NULL);
 	i = 0;
+	while (buff[i] && buff[i] != '\n')
+		i++;
+	if (!buff[i])
+	{
+		free(buff);
+		return (NULL);
+	}
+	buffer = malloc(sizeof(char) * (ft_strlen(buff) - i));
+	if (!buffer)
+		return (NULL);
+	i++;
+	j = 0;
+	while (buff[i])
+		buffer[j++] = buff[i++];
+	buffer[j] = '\0';
+	free(buff);
+	return (buffer);
+}
+
+/*static char	*update_buffer(char *buff)
+{
+	size_t	i;
+	size_t	j;
+	char	*buffer;
+
+	if (!buff)
+		return (NULL);
+	i = 0;
 	while (buff[i] != '\n')
 		i++;
 	i++;
-	buffer = malloc(sizeof(char) * i);
+	buffer = malloc(sizeof(char) * (i);
 	if (!buffer)
 		return (NULL);
 	j = 0;
@@ -101,4 +145,4 @@ static char	*update_buffer(char *buff)
 	buffer[j] = '\0';
 	free(buff);
 	return (buffer);
-}
+}*/
