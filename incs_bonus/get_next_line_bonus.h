@@ -16,7 +16,7 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <stdio.h>
-# include <unistd.h>
+# include <unistd.h> // For FOPEN_MAX
 
 # ifndef BUFFER_SIZE
 # define BUFFER_SIZE 10

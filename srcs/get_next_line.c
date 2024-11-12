@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./get_next_line.h"
+#include "../incs/get_next_line.h"
 #include <unistd.h>
 
 static char	*read_and_store(int fd, char *buff);

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../get_next_line_bonus.h"
+#include "../incs_bonus/get_next_line_bonus.h"
 #include "ansi.h"
 #include <string.h>
 
@@ -30,46 +30,50 @@ int main(int argc, char **argv)
     const char *folder_path = "files";
     char full_path[1024];
     char *line;
-    int fd;
+    int fd[FOPEN_MAX];
+	int	n_fds;
+	int	i;
 
-    if (argc != 2)
+    if (argc < 2)
     {
-        printf("%sPlease execute the program again with a valid filename.%s\n", HRED, RESET);
+        printf("%sPlease execute the program again with valid filenames (at least one).%s\n", HRED, RESET);
         return (1);
     }
+	n_fds = argc - 1;
+	for (i = 0; i < n_fds; ++i)
+	{
+	    if (!is_file_in_folder(argv[i], folder_path, full_path, sizeof(full_path)))
+		{
+			printf("%s'%s' is not a valid file in the 'files' folder.%s\n", HRED, argv[i], RESET);
+			return (1);
+		}
 
-    if (!is_file_in_folder(argv[1], folder_path, full_path, sizeof(full_path)))
-    {
-        printf("%s'%s' is not a valid file in the 'files' folder.%s\n", HRED, argv[1], RESET);
-        return (1);
-    }
+		print_header("File Information");
+		printf("%sFile: %s%s\n", HCYN, full_path, RESET);
+		printf("%sBUFFER_SIZE: %d%s\n\n", HCYN, BUFFER_SIZE, RESET);
 
-    print_header("File Information");
-    printf("%sFile: %s%s\n", HCYN, full_path, RESET);
-    printf("%sBUFFER_SIZE: %d%s\n\n", HCYN, BUFFER_SIZE, RESET);
+		fd[i] = open(full_path, O_RDONLY);
+		if (fd[i] == -1)
+		{
+			printf("%sError opening file.%s\n", HRED, RESET);
+			return (1);
+		}
 
-    fd = open(full_path, O_RDONLY);
-    if (fd == -1)
-    {
-        printf("%sError opening file.%s\n", HRED, RESET);
-        return (1);
-    }
+		print_header("File Contents");
+		while ((line = get_next_line(fd[i])) != NULL)
+		{
+			printf("%s%s%s", HGRN, line, RESET);
+			total_lines++;
+			total_chars += strlen(line) - 1;
+			free(line);
+		}
 
-    print_header("File Contents");
-    while ((line = get_next_line(fd)) != NULL)
-    {
-        printf("%s%s%s", HGRN, line, RESET);
-        total_lines++;
-        total_chars += strlen(line) - 1;
-        free(line);
-    }
+		close(fd[i]);
 
-    close(fd);
-
-    print_header("Summary");
-    printf("%sTotal lines read: %d%s\n", HYEL, total_lines, RESET);
-    printf("%sTotal characters read: %d%s\n", HYEL, total_chars, RESET);
-
+		print_header("Summary");
+		printf("%sTotal lines read: %d%s\n", HYEL, total_lines, RESET);
+		printf("%sTotal characters read: %d%s\n", HYEL, total_chars, RESET);
+	}
     return (0);
 }
 

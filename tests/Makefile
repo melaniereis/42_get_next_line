@@ -4,6 +4,7 @@
 
 # Main target names
 NAME = get_next_line_tester.out
+NAME_BONUS = get_next_line_tester_bonus.out
 
 #------------------------------------------------------------------------------#
 #                                COLORS & STYLES                               #
@@ -43,12 +44,20 @@ SRC_PATH = ../srcs
 BONUS_PATH = ../srcs_bonus
 INC_PATH = ../incs
 INC_PATH_BONUS = ../incs_bonus
+FILES_PATH = ./files/
 HEADERS = ${INC_PATH}/get_next_line.h
+HEADERS_BONUS = ${INC_PATH}/get_next_line_bonus.h
 
 # Source files for main library
 SRCS = ${addprefix ${SRC_PATH}/, get_next_line.c get_next_line_utils.c}
 # Object files derived from source files
 OBJS = ${addprefix ${BUILD_PATH}/, ${notdir ${SRCS:.c=.o}}}
+# Source files for main library
+SRCS_BONUS = ${addprefix ${SRC_PATH}/, get_next_line_bonus.c \
+			 get_next_line_utils_bonus.c}
+# Object files derived from source files
+OBJS_BONUS = ${addprefix ${BUILD_PATH}/, ${notdir ${SRCS_BONUS:.c=.o}}}
+FILES = ${addprefix ${FILES_PATH}/, excuse-me.txt}
 
 #------------------------------------------------------------------------------#
 #                            	   FLAGS & COMMANDS                            #
@@ -56,7 +65,9 @@ OBJS = ${addprefix ${BUILD_PATH}/, ${notdir ${SRCS:.c=.o}}}
 
 CC = cc                           # Compiler to use
 CCFLAGS = -Wall -Wextra -Werror   # Compiler flags for warnings and errors
-RM = rm -fr                       # Command to remove files/directories forcefully
+BUFFFLAGS		?= -D BUFFER_SIZE=
+BUFFER_SIZE ?= 11
+RM = rm -fr                       # Command to remove files/directoriesforcefully
 MKDIR_P = mkdir -p                # Command to create directories (with parent)
 INC = -I ${INC_PATH}              # Include path for header file
 
@@ -66,44 +77,36 @@ INC = -I ${INC_PATH}              # Include path for header file
 
 ##  Compilation Rules for Libft  ##
 
-all: deps ${NAME}                  # Default target: build the ft_printflibft
-
-${NAME}: ${BUILD_PATH} ${OBJS} ${LIBFT_ARC}
-	@printf "\n${YELLOW}${BOLD}${BUILD} Assembling ${WHITE}${NAME}${YELLOW}...${RESET}\n"
-	@${AR} ${NAME} ${OBJS} ${LIBFT_ARC}
-	@printf "${GREEN}${BOLD}${ROCKET} ${WHITE}${NAME}${GREEN} created successfully!${RESET}\n"
+all: ${BUILD_PATH} ${OBJS}
+	@printf "${CYAN}${DIM}Compiling main.c for test...${RESET}\n"
+	@${CC} ${CCFLAGS} ${BUFFFLAGS} ${BUFFER_SIZE} main.c ${OBJS} ${FILES} -o ${NAME}
+	@printf "${GREEN}${BOLD}${CHECK} Test executable compiled successfully!${RESET}\n"
+	@printf "${YELLOW}${BOLD}Running tests...${RESET}\n"
+	@./${NAME}
+	@printf "${GREEN}${BOLD}${CHECK} Tests completed!${RESET}\n"
+	@${RM} ${NAME}
 
 ${BUILD_PATH}:
 	@printf "\n${BLUE}${BOLD}Creating build directory...${RESET}\n"
 	@${MKDIR_P} ${BUILD_PATH}
 	@printf "${GREEN}${BOLD}${CHECK} Build directory created successfully!${RESET}\n"
 
-${LIBFT_ARC}: deps
-	@printf "${CYAN}${BOLD}${DIM} Compiling Libft..${RESET}\n"
-	@${MAKE_BONUS} ${LIBFT_PATH}
-	@printf "${BLUE}${BOLD}${BUILD} ${WHITE}${LIBFT_ARC}${GREEN} compiled! ${RESET}\n"
-
 ${BUILD_PATH}/%.o: ${SRC_PATH}/%.c ${HEADERS} | ${BUILD_PATH}
 	@printf "${CYAN}${DIM}Compiling: ${WHITE}%-30s${RESET}\r" ${notdir $<}
-	@${CC} ${CCFLAGS} ${INC} -c $< -o $@
+	@${CC} ${CCFLAGS} ${BUFFFLAGS} ${BUFFER_SIZE} ${INC} -c $< -o $@
 
-deps:
-	@if test ! -d "${LIBFT_PATH}"; then make get_libft; \
-		else printf "${GREEN}${BOLD}${ROCKET} ${WHITE}${LIBFT_ARC}${GREEN} folder found!${RESET}\n"; fi
+${BUILD_PATH}/%.o: ${BONUS_PATH}/%.c ${HEADERS_BONUS}  # Compile bonus source files into object files (bonus)
+	@printf "${CYAN}${DIM}Compiling: ${WHITE}%-30s${RESET}\r" ${notdir $<}
+	@${CC} ${CCFLAGS} ${BUFFFLAGS} ${BUFFER_SIZE} ${INC} -c $< -o $@
 
-get_libft:
-	@printf "${CYAN}${BOLD}${BOOK} Getting Libft..${RESET}\n"
-	@git clone git@github.com:melaniereis/42_libft.git ${LIBFT_PATH}
-	@printf "${GREEN}${BOLD}${ROCKET} ${WHITE}${LIBFT_ARC}${GREEN} successfully downloaded!${RESET}\n"
-
-test: ${BUILD_PATH} ${OBJS} ${LIBFT_ARC}
-	@printf "${CYAN}${DIM}Compiling main.c for test...${RESET}\n"
-	@${CC} ${CCFLAGS} main.c ${OBJS} ${LDFLAGS} -o ${EXEC}
+bonus: ${BUILD_PATH} ${OBJS_BONUS}
+	@printf "${CYAN}${DIM}Compiling main_bonus.c for test...${RESET}\n"
+	@${CC} ${CCFLAGS} ${BUFFFLAGS} ${BUFFER_SIZE} main_bonus.c ${OBJS_BONUS} -o ${NAME_BONUS}
 	@printf "${GREEN}${BOLD}${CHECK} Test executable compiled successfully!${RESET}\n"
-	@printf "${YELLOW}${BOLD}Running test...${RESET}\n"
-	@./${EXEC}
-	@printf "${GREEN}${BOLD}${CHECK} Test completed!${RESET}\n"
-	@${RM} ${EXEC}
+	@printf "${YELLOW}${BOLD}Running tests...${RESET}\n"
+	@./${NAME_BONUS}
+	@printf "${GREEN}${BOLD}${CHECK} Tests completed!${RESET}\n"
+	@${RM} ${NAME_BONUS}
 
 ##  Norms Rules  ##
 
@@ -120,7 +123,7 @@ norm_mandatory:                # Check norms for mandatory sources
 
 norm_bonus:                    # Check norms for bonus sources 
 	@printf "\n${BLUE}${BOLD}${TEST} Checking Norminette...${RESET}\n"
-	@norminette_output=$$(norminette ${BONUS_PATH}/*.c ${INC_PATH}/*.h | grep -v "OK!" || true); \
+	@norminette_output=$$(norminette ${BONUS_PATH}/*.c ${INC_PATH_BONUS}/*.h | grep -v "OK!" || true); \
 	if [ -z "$$norminette_output" ]; then \
 		printf "${GREEN}${BOLD}${CHECK} No norminette errors found!${RESET}\n"; \
 	else \
@@ -130,15 +133,8 @@ norm_bonus:                    # Check norms for bonus sources
 	@printf "${GREEN}${BOLD}${CHECK} Norminette check completed!${RESET}\n"
 
 norm_all:                     # Check norms for all sources 
-	@printf "\n${BLUE}${BOLD}${TEST} Checking Norminette...${RESET}\n"
-	@norminette_output=$$(norminette ${SRC_PATH}/*.c ${BONUS_PATH}/*.c ${INC_PATH}/*.h | grep -v "OK!" || true); \
-	if [ -z "$$norminette_output" ]; then \
-		printf "${GREEN}${BOLD}${CHECK} No norminette errors found!${RESET}\n"; \
-	else \
-		printf "$$norminette_output\n"; \
-		printf "${RED}${BOLD}❌ Norminette errors found.${RESET}\n"; \
-	fi
-	@printf "${GREEN}${BOLD}${CHECK} Norminette check completed!${RESET}\n"
+	@make norm_mandatory
+	@make norm_bonus
 
 ##   Check for external functions  ##
 check_external_functions: all               # Check norms for mandatory sources 

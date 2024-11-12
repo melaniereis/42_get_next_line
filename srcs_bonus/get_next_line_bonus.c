@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./get_next_line.h"
+#include "../incs_bonus/get_next_line_bonus.h"
 #include <unistd.h>
 
 static char	*read_and_store(int fd, char *buff);
@@ -19,27 +19,27 @@ static char	*update_buffer(char *buff);
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[FOPEN_MAX];
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd > FOPEN_MAX)
 	{
-		free(buffer);
-		buffer = NULL;
+		free(buffer[fd]);
+		buffer[fd] = NULL;
 		return (NULL);
 	}
-	if (!buffer)
+	if (!buffer[fd])
 	{
-		buffer = malloc(1);
-		if (!buffer)
+		buffer[fd] = malloc(1);
+		if (!buffer[fd])
 			return (NULL);
-		buffer[0] = '\0';
+		buffer[0] = NULL;
 	}
-	buffer = read_and_store(fd, buffer);
-	if (!buffer)
+	buffer[fd] = read_and_store(fd, buffer[fd]);
+	if (!buffer[fd])
 		return (NULL);
-	line = extract_line(buffer);
-	buffer = update_buffer(buffer);
+	line = extract_line(buffer[fd]);
+	buffer[fd] = update_buffer(buffer[fd]);
 	return (line);
 }
 
