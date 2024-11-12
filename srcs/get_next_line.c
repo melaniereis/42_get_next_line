@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #include "../incs/get_next_line.h"
-#include <unistd.h>
 
 static char	*read_and_store(int fd, char *buff);
+static char	*ft_create_buffer(char *buff, char *buffer);
 static char	*extract_line(char *buff);
 static char	*update_buffer(char *buff);
 
@@ -23,18 +23,7 @@ char	*get_next_line(int fd)
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-	{
-		free(buffer);
-		buffer = NULL;
 		return (NULL);
-	}
-	if (!buffer)
-	{
-		buffer = malloc(1);
-		if (!buffer)
-			return (NULL);
-		buffer[0] = '\0';
-	}
 	buffer = read_and_store(fd, buffer);
 	if (!buffer)
 		return (NULL);
@@ -48,6 +37,13 @@ static char	*read_and_store(int fd, char *buff)
 	char	*buffer;
 	ssize_t	bytes_read;
 
+	if (!buff)
+	{
+		buff = malloc(1);
+		if (!buff)
+			return (NULL);
+		buff[0] = '\0';
+	} 
 	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buffer)
 		return (NULL);
@@ -55,23 +51,25 @@ static char	*read_and_store(int fd, char *buff)
 	while (bytes_read > 0 && !ft_strchr(buff, '\n'))
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_read == -1)
-		{
-			free (buffer);
-			free (buff);
-			return (NULL);
-		}
+		if (bytes_read <= 0)
+			break;
 		buffer[bytes_read] = '\0';
-		buff = ft_strjoin(buff, buffer);
+		buff = ft_create_buffer(buff, buffer);
 	}
-	if (bytes_read == 0 && buff[0] == '\0')
-	{
-		free(buff);
-		free(buffer);
-		return (NULL);
-	}
+	if (bytes_read <= 0 || !buff)
+		return (free(buff), free(buffer), NULL);
 	free(buffer);
 	return (buff);
+}
+
+static char	*ft_create_buffer(char *buff, char *buffer)
+{
+	char	*tempbuff;
+
+	tempbuff = ft_strjoin(buff, buffer);
+	if (!tempbuff)
+		return (free(buff), NULL);
+	return (tempbuff);
 }
 
 static char	*extract_line(char *buff)
@@ -90,8 +88,10 @@ static char	*extract_line(char *buff)
 	if (!line)
 		return (NULL);
 	i = -1;
-	while (++i < line_size)
+	while (++i < line_size - 1)
 		line[i] = buff[i];
+	if (buff[i] == '\n') // If there's a newline, add it to line
+		line[i++] = '\n';
 	line[i] = '\0';
 	return (line);
 }
@@ -102,16 +102,11 @@ static char	*update_buffer(char *buff)
 	size_t	j;
 	char	*buffer;
 
-	if (!buff)
-		return (NULL);
 	i = 0;
 	while (buff[i] && buff[i] != '\n')
 		i++;
 	if (!buff[i])
-	{
-		free(buff);
-		return (NULL);
-	}
+		return (free(buff), NULL);
 	buffer = malloc(sizeof(char) * (ft_strlen(buff) - i));
 	if (!buffer)
 		return (NULL);
