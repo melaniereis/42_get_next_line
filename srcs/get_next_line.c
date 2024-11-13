@@ -72,28 +72,30 @@ static char	*ft_create_buffer(char *buff, char *buffer)
 	return (tempbuff);
 }
 
-static char	*extract_line(char *buff)
+static char *extract_line(char *buff)
 {
-	size_t	line_size;
-	size_t	i;
-	char	*line;
+    size_t  line_size;
+    size_t  i;
+    char    *line;
 
-	line_size = 0;
-	if (!buff)
-		return (NULL);
-	while (buff[line_size] && buff[line_size] != '\n')
-		line_size++;
-	line_size++;
-	line = malloc(sizeof(char) * (line_size + 1));
-	if (!line)
-		return (NULL);
-	i = -1;
-	while (++i < line_size - 1)
-		line[i] = buff[i];
-	if (buff[i] == '\n') // If there's a newline, add it to line
-		line[i++] = '\n';
-	line[i] = '\0';
-	return (line);
+    if (!buff || !*buff)
+        return (NULL);
+    line_size = 0;
+    while (buff[line_size] && buff[line_size] != '\n')
+        line_size++;
+    line = malloc(sizeof(char) * (line_size + 2)); // +2 for potential \n and \0
+    if (!line)
+        return (NULL);
+    i = 0;
+    while (i < line_size)
+    {
+        line[i] = buff[i];
+        i++;
+    }
+    if (buff[i] == '\n')
+        line[i++] = '\n';
+    line[i] = '\0';
+    return (line);
 }
 
 static char	*update_buffer(char *buff)
